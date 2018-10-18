@@ -50,11 +50,57 @@ class LockControl: UIControl {
         focusView.backgroundColor = UIColor.black
         focusView.layer.cornerRadius = 18.0
         focusView.clipsToBounds = true
+        
+        let recognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
+        focusView.addGestureRecognizer(recognizer)
         self.addSubview(focusView)
+        
+        handlePan(recognizer)
+    }
+    
+    @objc func handlePan(_ recognizer: UIPanGestureRecognizer) {
+        
+        let translation: CGPoint = recognizer.translation(in: focusView)
+        
+        guard let view = recognizer.view else { return }
+        
+        let startCenter = CGPoint(x: 30.0, y: 220.0)
+        var endPoint = CGPoint(x: 220.0, y: 220.0)
+    
+        view.center = CGPoint(x: view.center.x + translation.x, y: view.center.y)
+        
+        
+        
+        switch recognizer.state {
+        case .began:
+            percentageAcross = 0.0
+        case .changed:
+            percentageAcross = (view.center.x - startCenter.x) / (endPoint.x - startCenter.x)
+        case .ended:
+            if percentageAcross > 0.0 && percentageAcross < 0.8 {
+                setup()
+            } else if percentageAcross > 0.8 {
+                view.center = endPoint
+                unlock()
+            }
+        case .cancelled:
+            setup()
+        default:
+            break
+        }
+        
+        recognizer.setTranslation(CGPoint.zero, in: focusView)
+    }
+    
+    func unlock() {
+        lockView.image = UIImage(named: "Unlocked")
+
+        // animate Reset button or toggle variable
     }
     
     // MARK: - SubViews and properties
     
+    var percentageAcross: CGFloat = 0.0
     
     let lockView = UIImageView()
     let sliderView = UIView()
