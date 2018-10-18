@@ -16,6 +16,8 @@ enum Appearance {
     static func setUpCrimsonTheme() {
         UINavigationBar.appearance().barTintColor = crimson
         UIBarButtonItem.appearance().tintColor = wheat
+        UIButton.appearance().tintColor = wheat
+        UILabel.appearance().tintColor = wheat
     }
 }
 
@@ -65,7 +67,7 @@ class LockControl: UIControl {
         guard let view = recognizer.view else { return }
         
         let startCenter = CGPoint(x: 30.0, y: 220.0)
-        var endPoint = CGPoint(x: 220.0, y: 220.0)
+        let endPoint = CGPoint(x: 220.0, y: 220.0)
     
         view.center = CGPoint(x: view.center.x + translation.x, y: view.center.y)
         
@@ -95,12 +97,13 @@ class LockControl: UIControl {
     func unlock() {
         lockView.image = UIImage(named: "Unlocked")
 
-        // animate Reset button or toggle variable
+        NotificationCenter.default.post(name: .unlocked, object: nil)
     }
     
     // MARK: - SubViews and properties
     
     var percentageAcross: CGFloat = 0.0
+    var isLocked = false
     
     let lockView = UIImageView()
     let sliderView = UIView()

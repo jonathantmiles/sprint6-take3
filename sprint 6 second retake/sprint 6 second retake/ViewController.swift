@@ -12,13 +12,41 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        NotificationCenter.default.addObserver(self, selector: #selector(setUnlockStatus(notification:)), name: .unlocked, object: nil)
     }
 
-    @IBAction func resetLock(_ sender: Any) {
+    
+    @IBOutlet weak var resetLockButton: UIBarButtonItem! {
+        didSet {
+            let resetButton = UIButton(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 35.0, height: 25.0)))
+            resetButton.setTitle("Reset", for: .normal)
+            resetButton.addTarget(self, action: #selector(resetLockAction), for: .touchUpInside)
+            resetButton.tintColor = Appearance.wheat
+            resetLockButton.customView = resetButton
+            
+            UIView.animate(withDuration: 0.0) {
+                self.resetLockButton.customView!.alpha = 0.0
+            }
+            
+        }
+    }
+    
+    @objc func resetLockAction() {
         lockControl.setup()
+        UIView.animate(withDuration: 0.0) {
+            self.resetLockButton.customView!.alpha = 0.0
+        }
+    }
+    
+    @objc func setUnlockStatus(notification: NSNotification) {
+        UIView.animate(withDuration: 0.0) {
+            self.resetLockButton.customView!.alpha = 1.0
+        }
     }
     
     @IBOutlet weak var lockControl: LockControl!
 }
 
+extension Notification.Name {
+    static let unlocked = Notification.Name("unlocked")
+}
